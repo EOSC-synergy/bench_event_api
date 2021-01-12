@@ -9,7 +9,7 @@ config:
       #dockerhub: worsica/worsica-processing
       #dockertag: $branch
 
-sqa-criteria:
+sqa_criteria:
   qc_style:
     repos:
       bench_api:

@@ -36,9 +36,9 @@ sqa_criteria:
             - cover
             - cobertura
 
-environment:
-  GIT_COMMITTER_NAME: javi-gv94
-  GIT_COMMITTER_EMAIL: javier.garrayo@hotmail.com
-  LANG: C.UTF-8
+#environment:
+ # GIT_COMMITTER_NAME: javi-gv94
+  #GIT_COMMITTER_EMAIL: javier.garrayo@hotmail.com
+  #LANG: C.UTF-8
 
-timeout: 600
+#timeout: 600

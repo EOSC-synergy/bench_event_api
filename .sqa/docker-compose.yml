@@ -1,4 +1,4 @@
-version: "3"
+version: "3.2"
 
 services:
   processing:
@@ -6,6 +6,6 @@ services:
     container_name: "processing"
     hostname: "processing"
     volumes:
-     - type: "bind"
-       source: "./bench_event_api"
-       target: "/bench_event_api-testing"
+     - type: bind
+       source: ./bench_event_api
+       target: /bench_event_api-testing

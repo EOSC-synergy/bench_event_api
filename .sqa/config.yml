@@ -22,7 +22,7 @@ sqa_criteria:
       bench_api:
         container: processing
         tox:
-          tox_file: /bench_event_api/tox.ini
+          tox_file: /bench_event_api-testing/tox.ini
           testenv:
             - pep8
   qc_security:
@@ -30,7 +30,7 @@ sqa_criteria:
       bench_api:
         container: processing
         tox:
-          tox_file: /bench_event_api/tox.ini
+          tox_file: /bench_event_api-testing/tox.ini
           testenv:
             - bandit
   qc_coverage:
@@ -38,7 +38,7 @@ sqa_criteria:
       bench_api:
         container: processing
         tox:
-          tox_file: /bench_event_api/tox.ini
+          tox_file: /bench_event_api-testing/tox.ini
           testenv: 
             - cover
             - cobertura

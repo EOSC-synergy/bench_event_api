@@ -1,8 +1,8 @@
-version: "3.2"
+version: "3.6"
 
 services:
   processing:
-    image: "flask_bench_api:test"
+    image: "indigodatacloud/ci-images:python3.6"
     container_name: "processing"
     hostname: "processing"
     volumes:

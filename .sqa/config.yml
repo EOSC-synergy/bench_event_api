@@ -6,8 +6,15 @@ config:
     bench_api:
       repo: 'https://github.com/inab/bench_event_api.git'
       branch: jenkins
-      #dockerhub: worsica/worsica-processing
-      #dockertag: $branch
+
+#   credentials:
+#     - id: my-dockerhub-token
+#       username_var: JPL_DOCKERUSER
+#       password_var: JPL_DOCKERPASS
+
+# environment:
+#   JPL_DOCKERPUSH: "processing"
+#   JPL_IGNOREFAILURES: "defined"
 
 sqa_criteria:
   qc_style:

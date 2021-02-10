@@ -7,5 +7,5 @@ services:
     hostname: "processing"
     volumes:
      - type: bind
-       source: ./bench_event_api
+       source: .
        target: /bench_event_api-testing

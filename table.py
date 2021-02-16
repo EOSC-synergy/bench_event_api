@@ -229,11 +229,11 @@ def get_data(base_url, bench_id, classificator_id, challenge_list):
         url = base_url + "sciapi/graphql"
         # get datasets for provided benchmarking event
         json = { 'query' : '{\
-                                getBenchmarkingEvents(benchmarkingEventFilters:{id:"'+ bench_id + '"}) {\
+                                getBenchmarkingEvents(benchmarkingEventFilters:{id:"' + bench_id + '"}) {\
                                     _id\
                                     community_id\
                                 }\
-                                getChallenges(challengeFilters: {benchmarking_event_id: "'+ bench_id + '"}) {\
+                                getChallenges(challengeFilters: {benchmarking_event_id: "' + bench_id + '"}) {\
                                     _id\
                                     acronym\
                                     metrics_categories{\
@@ -253,26 +253,27 @@ def get_data(base_url, bench_id, classificator_id, challenge_list):
                                         type\
                                     }\
                                 }\
-                            }' }
+                            }'}
 
-        r = requests.post(url=url, json=json, verify=False )
+        r = requests.post(url=url, json=json, verify=False)
         response = r.json()
         if response["data"]["getBenchmarkingEvents"] == []:
 
-            return { 'data': None}
+            return {'data': None}
 
         else:
             data = response["data"]["getChallenges"]
             # get tools for provided benchmarking event
-            community_id = response["data"]["getBenchmarkingEvents"][0]["community_id"]
-            json2 = { 'query' : '{\
-                                    getTools(toolFilters:{community_id:"'+ community_id + '"}) {\
+            community_id = response["data"]["getBenchmarkingEvents"][0]\
+                                    ["community_id"]
+            json2 = {'query': '{\
+                                    getTools(toolFilters:{community_id:"' + community_id + '"}) {\
                                         _id\
                                         name\
                                     }\
-                                }' }
+                                }'}
 
-            r = requests.post(url=url, json=json2, verify=False )
+            r = requests.post(url=url, json=json2, verify=False)
             response2 = r.json()
             tool_list = response2["data"]["getTools"]
             # iterate over the list of tools to generate a dictionary
@@ -281,18 +282,18 @@ def get_data(base_url, bench_id, classificator_id, challenge_list):
                 tool_names[tool["_id"]] = tool["name"]
 
             # compute the classification
-            result = build_table(data, classificator_id, tool_names, challenge_list)
+            result = build_table(data, classificator_id, tool_names,
+                                 challenge_list)
 
             return result
 
     except Exception as e:
 
-        print (e)
+        print(e)
 
 
 # create blueprint and define url
 bp = Blueprint('table', __name__)
-
 
 
 @bp.route('/')
@@ -301,16 +302,18 @@ def index_page():
             USAGE:<br><br> \
             http://webpage:8080/bench_event_id/desired_classification"
 
+
 @bp.route('/<string:bench_id>')
-@bp.route('/<string:bench_id>/<string:classificator_id>', methods = ['POST', 'GET'])
+@bp.route('/<string:bench_id>/<string:classificator_id>', methods= \
+            ['POST', 'GET'])
 def compute_classification(bench_id, classificator_id="diagonals"):
-	
+
     mode = "dev"
     if mode == "production":
-	    base_url = "https://openebench.bsc.es/"
+        base_url = "https://openebench.bsc.es/"
     else:
-	    base_url = "https://dev-openebench.bsc.es/"
-    
+        base_url = "https://dev-openebench.bsc.es/"
+
     if request.method == 'POST':
         challenge_list = request.get_data()
         out = get_data(base_url, bench_id, classificator_id, challenge_list)
@@ -323,9 +326,6 @@ def compute_classification(bench_id, classificator_id="diagonals"):
         response = jsonify(out)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
-        # return send_from_directory("/home/jgarrayo/public_html/flask_table/", "table.svg", as_attachment=False)
-        # return send_file(out, mimetype='svg')
-        # return render_template('index.html', data=out)
 
 # if __name__ == "__main__":
 #     app.run()

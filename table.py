@@ -5,15 +5,13 @@ from flask import (
 )
 from sklearn.cluster import KMeans
 import numpy as np
-import pandas
-import json
 import requests
 
 
 # funtion that gets quartiles for x and y values
 def plot_square_quartiles(tools_dict, better, percentile=50):
 
-    # generate 3 lists: 
+    # generate 3 lists:
     x_values = []
     means = []
     tools = []
@@ -22,7 +20,8 @@ def plot_square_quartiles(tools_dict, better, percentile=50):
         x_values.append(metrics[0])
         means.append(metrics[1])
 
-    x_percentile, y_percentile = (np.nanpercentile(x_values, percentile), np.nanpercentile(means, percentile))
+    x_percentile, y_percentile = (np.nanpercentile(x_values, percentile), 
+                                    np.nanpercentile(means, percentile))
 
     # create a dictionary with tools and their corresponding quartile
     tools_quartiles = {}
@@ -59,8 +58,10 @@ def normalize_data(x_values, means):
     return x_norm, means_norm
 
 
-# funtion that splits the analysed tools into four quartiles, according to the asigned score
-def get_quartile_points(scores_and_values, first_quartile, second_quartile, third_quartile):
+# funtion that splits the analysed tools into four quartiles,
+# according to the asigned score
+def get_quartile_points(scores_and_values, first_quartile, 
+                        second_quartile, third_quartile):
     tools_quartiles = {}
     for i, val in enumerate(scores_and_values, 0):
         if scores_and_values[i][0] > third_quartile:
@@ -75,10 +76,11 @@ def get_quartile_points(scores_and_values, first_quartile, second_quartile, thir
     return (tools_quartiles)
 
 
-# funtion that separate the points through diagonal quartiles based on the distance to the 'best corner'
-def plot_diagonal_quartiles( tools_dict, better):
+# funtion that separate the points through diagonal quartiles based on 
+# the distance to the 'best corner'
+def plot_diagonal_quartiles(tools_dict, better):
 
-    # generate 3 lists: 
+    # generate 3 lists:
     x_values = []
     means = []
     tools = []
@@ -90,7 +92,8 @@ def plot_diagonal_quartiles( tools_dict, better):
     # normalize data to 0-1 range
     x_norm, means_norm = normalize_data(x_values, means)
 
-    # compute the scores for each of the tool. based on their distance to the x and y axis
+    # compute the scores for each of the tool. based on their distance 
+    # to the x and y axis
     scores = []
     for i, val in enumerate(x_norm, 0):
         if better == "bottom-right":
@@ -99,15 +102,19 @@ def plot_diagonal_quartiles( tools_dict, better):
             scores.append(x_norm[i] + means_norm[i])
 
     # region sort the list in descending order
-    scores_and_values = sorted([[scores[i], x_values[i], means[i], tools[i]] for i, val in enumerate(scores, 0)],
+    scores_and_values = sorted([[scores[i], x_values[i], means[i],
+                                 tools[i]] for i, val in enumerate(scores, 0)],
                                reverse=True)
     scores = sorted(scores, reverse=True)
 
     first_quartile, second_quartile, third_quartile = (
-        np.nanpercentile(scores, 25), np.nanpercentile(scores, 50), np.nanpercentile(scores, 75))
+        np.nanpercentile(scores, 25), np.nanpercentile(scores, 50), 
+        np.nanpercentile(scores, 75)
+    )
 
     # split in quartiles
-    tools_quartiles = get_quartile_points(scores_and_values, first_quartile, second_quartile, third_quartile)
+    tools_quartiles = get_quartile_points(scores_and_values, first_quartile, 
+                                          second_quartile, third_quartile)
 
     return (tools_quartiles)
 
@@ -115,7 +122,7 @@ def plot_diagonal_quartiles( tools_dict, better):
 # function that clusters participants using the k-means algorithm
 def cluster_tools(tools_dict, better):
 
-    # generate 3 lists: 
+    # generate 3 lists:
     x_values = []
     means = []
     tools = []
@@ -123,7 +130,6 @@ def cluster_tools(tools_dict, better):
         tools.append(key)
         x_values.append(metrics[0])
         means.append(metrics[1])
-
 
     X = np.array(zip(x_values, means))
     kmeans = KMeans(n_clusters=4, n_init=50, random_state=0).fit(X)
@@ -154,7 +160,8 @@ def cluster_tools(tools_dict, better):
 
     # assign ranking to distances array
     output = [0] * len(distances)
-    for i, x in enumerate(sorted(range(len(distances)), key=lambda y: distances[y], reverse=True)):
+    for i, x in enumerate(sorted(range(len(distances)), 
+                                 key=lambda y: distances[y], reverse=True)):
         output[x] = i
 
     # reorder the clusters according to distance
@@ -170,40 +177,47 @@ def cluster_tools(tools_dict, better):
     return tools_clusters
 
 
-###########################################################################################################
-###########################################################################################################
+####################################################################
+####################################################################
 
 
 def build_table(data, classificator_id, tool_names, challenge_list):
 
-    # this dictionary will store all the information required for the quartiles table
+    # this dictionary will store all the information required for the 
+    # quartiles table
     quartiles_table = []
 
     for challenge in data:
-        
+
         challenge_id = challenge['acronym']
         challenge_OEB_id = challenge['_id']
-        challenge_X_metric = challenge['metrics_categories'][0]['metrics'][0]['metrics_id']
-        challenge_Y_metric = challenge['metrics_categories'][0]['metrics'][1]['metrics_id']
+        challenge_X_metric = challenge['metrics_categories'][0]
+                                        ['metrics'][0]['metrics_id']
+        challenge_Y_metric = challenge['metrics_categories'][0]
+                                        ['metrics'][1]['metrics_id']
 
-        if challenge_list == [] or str.encode(challenge_OEB_id) in challenge_list:
+        if challenge_list == [] or
+                str.encode(challenge_OEB_id) in challenge_list:
 
             challenge_object = {}
             tools = {}
             better = 'top-right'
-            # loop over all assessment datasets and create a dictionary like -> { 'tool': [x_metric, y_metric], ..., ... }
+            # loop over all assessment datasets and create a dictionary like ->
+            #  { 'tool': [x_metric, y_metric], ..., ... }
             for dataset in challenge['datasets']:
                 if dataset['type'] == "assessment":
-                    #get tool which this dataset belongs to
+                    # get tool which this dataset belongs to
                     tool_id = dataset['depends_on']['tool_id']
                     tool_name = tool_names[tool_id]
                     if tool_name not in tools:
-                        tools[tool_name] = [0]*2
+                        tools[tool_name] = [0] * 2
                     # get value of the two metrics
                     metric = float(dataset['datalink']['inline_data']['value'])
-                    if dataset['depends_on']['metrics_id'] == challenge_X_metric:
+                    if dataset['depends_on']['metrics_id'] \
+                        == challenge_X_metric:
                         tools[tool_name][0] = metric
-                    elif dataset['depends_on']['metrics_id'] == challenge_Y_metric:
+                    elif dataset['depends_on']['metrics_id'] \
+                        == challenge_Y_metric:
                         tools[tool_name][1] = metric
 
             # get quartiles depending on selected classification method
@@ -215,7 +229,7 @@ def build_table(data, classificator_id, tool_names, challenge_list):
                 tools_quartiles = cluster_tools(tools, better)
 
             else:
-                tools_quartiles = plot_diagonal_quartiles( tools, better)
+                tools_quartiles = plot_diagonal_quartiles(tools, better)
 
             challenge_object["_id"] = challenge_OEB_id
             challenge_object["acronym"] = challenge_id
@@ -224,11 +238,12 @@ def build_table(data, classificator_id, tool_names, challenge_list):
     
     return quartiles_table
 
+
 def get_data(base_url, bench_id, classificator_id, challenge_list):
     try:
         url = base_url + "sciapi/graphql"
         # get datasets for provided benchmarking event
-        json = { 'query' : '{\
+        json = {'query': '{\
                                 getBenchmarkingEvents(benchmarkingEventFilters:{id:"' + bench_id + '"}) {\
                                     _id\
                                     community_id\

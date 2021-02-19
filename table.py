@@ -1,4 +1,5 @@
 #! /usr/bin/python3.6
+
 from __future__ import division
 from flask import (
     Blueprint, jsonify, request
@@ -20,8 +21,8 @@ def plot_square_quartiles(tools_dict, better, percentile=50):
         x_values.append(metrics[0])
         means.append(metrics[1])
 
-    x_percentile, y_percentile = (np.nanpercentile(x_values, percentile), 
-                                    np.nanpercentile(means, percentile))
+    x_percentile, y_percentile = (np.nanpercentile(
+        x_values, percentile), np.nanpercentile(means, percentile))
 
     # create a dictionary with tools and their corresponding quartile
     tools_quartiles = {}
@@ -60,7 +61,7 @@ def normalize_data(x_values, means):
 
 # funtion that splits the analysed tools into four quartiles,
 # according to the asigned score
-def get_quartile_points(scores_and_values, first_quartile, 
+def get_quartile_points(scores_and_values, first_quartile,
                         second_quartile, third_quartile):
     tools_quartiles = {}
     for i, val in enumerate(scores_and_values, 0):
@@ -76,7 +77,7 @@ def get_quartile_points(scores_and_values, first_quartile,
     return (tools_quartiles)
 
 
-# funtion that separate the points through diagonal quartiles based on 
+# funtion that separate the points through diagonal quartiles based on
 # the distance to the 'best corner'
 def plot_diagonal_quartiles(tools_dict, better):
 
@@ -92,7 +93,7 @@ def plot_diagonal_quartiles(tools_dict, better):
     # normalize data to 0-1 range
     x_norm, means_norm = normalize_data(x_values, means)
 
-    # compute the scores for each of the tool. based on their distance 
+    # compute the scores for each of the tool. based on their distance
     # to the x and y axis
     scores = []
     for i, val in enumerate(x_norm, 0):
@@ -108,12 +109,12 @@ def plot_diagonal_quartiles(tools_dict, better):
     scores = sorted(scores, reverse=True)
 
     first_quartile, second_quartile, third_quartile = (
-        np.nanpercentile(scores, 25), np.nanpercentile(scores, 50), 
+        np.nanpercentile(scores, 25), np.nanpercentile(scores, 50),
         np.nanpercentile(scores, 75)
     )
 
     # split in quartiles
-    tools_quartiles = get_quartile_points(scores_and_values, first_quartile, 
+    tools_quartiles = get_quartile_points(scores_and_values, first_quartile,
                                           second_quartile, third_quartile)
 
     return (tools_quartiles)
@@ -160,7 +161,7 @@ def cluster_tools(tools_dict, better):
 
     # assign ranking to distances array
     output = [0] * len(distances)
-    for i, x in enumerate(sorted(range(len(distances)), 
+    for i, x in enumerate(sorted(range(len(distances)),
                                  key=lambda y: distances[y], reverse=True)):
         output[x] = i
 
@@ -183,7 +184,7 @@ def cluster_tools(tools_dict, better):
 
 def build_table(data, classificator_id, tool_names, challenge_list):
 
-    # this dictionary will store all the information required for the 
+    # this dictionary will store all the information required for the
     # quartiles table
     quartiles_table = []
 
@@ -192,12 +193,14 @@ def build_table(data, classificator_id, tool_names, challenge_list):
         challenge_id = challenge['acronym']
         challenge_OEB_id = challenge['_id']
         challenge_X_metric = challenge['metrics_categories'][0]
-                                        ['metrics'][0]['metrics_id']
+        ['metrics'][0]['metrics_id']
         challenge_Y_metric = challenge['metrics_categories'][0]
-                                        ['metrics'][1]['metrics_id']
+        ['metrics'][1]['metrics_id']
 
-        if challenge_list == [] or
-                str.encode(challenge_OEB_id) in challenge_list:
+        if (
+            challenge_list == [] or
+            str.encode(challenge_OEB_id) in challenge_list
+        ):
 
             challenge_object = {}
             tools = {}
@@ -235,7 +238,7 @@ def build_table(data, classificator_id, tool_names, challenge_list):
             challenge_object["acronym"] = challenge_id
             challenge_object["participants"] = tools_quartiles
             quartiles_table.append(challenge_object)
-    
+
     return quartiles_table
 
 
@@ -279,8 +282,8 @@ def get_data(base_url, bench_id, classificator_id, challenge_list):
         else:
             data = response["data"]["getChallenges"]
             # get tools for provided benchmarking event
-            community_id = response["data"]["getBenchmarkingEvents"][0]\
-                                    ["community_id"]
+            community_id = response["data"]["getBenchmarkingEvents"][0]
+            ["community_id"]
             json2 = {'query': '{\
                                     getTools(toolFilters:{community_id:"' + community_id + '"}) {\
                                         _id\
@@ -319,8 +322,8 @@ def index_page():
 
 
 @bp.route('/<string:bench_id>')
-@bp.route('/<string:bench_id>/<string:classificator_id>', methods= \
-            ['POST', 'GET'])
+@bp.route('/<string:bench_id>/<string:classificator_id>',
+          methods=['POST', 'GET'])
 def compute_classification(bench_id, classificator_id="diagonals"):
 
     mode = "dev"

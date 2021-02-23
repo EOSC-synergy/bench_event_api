@@ -198,8 +198,8 @@ def build_table(data, classificator_id, tool_names, challenge_list):
         ['metrics'][1]['metrics_id']
 
         if (
-            challenge_list == [] or
-            str.encode(challenge_OEB_id) in challenge_list
+            challenge_list == [] or str.encode(
+                challenge_OEB_id) in challenge_list
         ):
 
             challenge_object = {}

@@ -4,7 +4,7 @@
 config:
   project_repos:
     bench_api:
-      repo: 'https://github.com/inab/bench_event_api.git'
+      repo: 'https://github.com/EOSC-synergy/bench_event_api.git'
       branch: jenkins
 
 #   credentials:

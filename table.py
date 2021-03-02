@@ -192,10 +192,10 @@ def build_table(data, classificator_id, tool_names, challenge_list):
 
         challenge_id = challenge['acronym']
         challenge_OEB_id = challenge['_id']
-        challenge_X_metric = challenge['metrics_categories'][0]
-        ['metrics'][0]['metrics_id']
-        challenge_Y_metric = challenge['metrics_categories'][0]
-        ['metrics'][1]['metrics_id']
+        challenge_X_metric = \
+            challenge['metrics_categories'][0]['metrics'][0]['metrics_id']
+        challenge_Y_metric = \
+            challenge['metrics_categories'][0]['metrics'][1]['metrics_id']
 
         if (
             challenge_list == [] or str.encode(
@@ -273,7 +273,7 @@ def get_data(base_url, bench_id, classificator_id, challenge_list):
                                 }\
                             }'}
 
-        r = requests.post(url=url, json=json, verify=False)
+        r = requests.post(url=url, json=json)
         response = r.json()
         if response["data"]["getBenchmarkingEvents"] == []:
 
@@ -283,15 +283,13 @@ def get_data(base_url, bench_id, classificator_id, challenge_list):
             data = response["data"]["getChallenges"]
             # get tools for provided benchmarking event
             community_id = response["data"]["getBenchmarkingEvents"][0]
-            ["community_id"]
             json2 = {'query': '{\
-                                    getTools(toolFilters:{community_id:"' + community_id + '"}) {\
+                                    getTools(toolFilters:{community_id:"' + community_id["community_id"] + '"}) {\
                                         _id\
                                         name\
                                     }\
                                 }'}
-
-            r = requests.post(url=url, json=json2, verify=False)
+            r = requests.post(url=url, json=json2)
             response2 = r.json()
             tool_list = response2["data"]["getTools"]
             # iterate over the list of tools to generate a dictionary
